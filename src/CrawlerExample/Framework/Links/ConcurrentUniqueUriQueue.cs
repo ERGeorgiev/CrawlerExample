@@ -2,7 +2,7 @@
 
 namespace CrawlerExample.Framework.Links;
 
-public class ConcurrentUniqueUriQueue : IUriQueue
+public class ConcurrentUniqueUriQueue
 {
     private readonly object _urisLock = new();
     private readonly Queue<Uri> _uris = new();
