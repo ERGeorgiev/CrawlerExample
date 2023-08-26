@@ -17,17 +17,17 @@ internal class Program
         var config = GetCrawlerExampleConfiguration();
         var crawler = new Crawler(config, startingLink);
 
-        Console.WriteLine("Starting Crawler...", startingLink);
+        Console.WriteLine("Starting Crawler...");
         var crawlerTask = crawler.Run();
-        Console.WriteLine("Crawler Started Successfully", startingLink);
+        Console.WriteLine("Crawler Started Successfully");
         while (crawlerTask.Status == TaskStatus.Running || crawlerTask.Status == TaskStatus.WaitingForActivation)
         {
             Console.WriteLine("Number of links found: {0}", crawler.Count);
-            Task.Delay(500).Wait();
+            Task.Delay(1000).Wait();
         }
 
         Console.WriteLine();
-        Console.WriteLine("All links found:", crawler.Count);
+        Console.WriteLine("{0} links found:", crawler.Count);
         foreach (var uri in crawler.Results.OrderBy(r => r.AbsoluteUri))
         {
             Console.WriteLine(uri.AbsoluteUri);
