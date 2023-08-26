@@ -5,11 +5,16 @@ VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample.Demo", "src\CrawlerExample.Demo\CrawlerExample.Demo.csproj", "{E3B82EB3-1D6A-48A8-9F9D-EAAAE0124167}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerExample", "src\CrawlerExample\CrawlerExample.csproj", "{D57C51C2-A2D3-4721-BB00-E07C6FF936DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample", "src\CrawlerExample\CrawlerExample.csproj", "{D57C51C2-A2D3-4721-BB00-E07C6FF936DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerExample.Test.Unit", "test\CrawlerExample.Test.Unit\CrawlerExample.Test.Unit.csproj", "{84513562-304A-4F06-8202-3598E2C3A8AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample.Test.Unit", "test\CrawlerExample.Test.Unit\CrawlerExample.Test.Unit.csproj", "{84513562-304A-4F06-8202-3598E2C3A8AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerExample.Test.Integration", "test\CrawlerExample.Test.Integration\CrawlerExample.Test.Integration.csproj", "{40B59009-77F5-45A5-87CF-7B50BFFB349A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample.Test.Integration", "test\CrawlerExample.Test.Integration\CrawlerExample.Test.Integration.csproj", "{40B59009-77F5-45A5-87CF-7B50BFFB349A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{194183CF-6750-4478-B8EB-F990000BE943}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
