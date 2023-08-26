@@ -1,6 +1,6 @@
 ﻿namespace CrawlerExample;
 
-public class WebCrawler
+public class Crawler
 {
 
 }
