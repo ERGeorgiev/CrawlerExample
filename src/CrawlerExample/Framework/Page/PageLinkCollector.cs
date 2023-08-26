@@ -21,18 +21,15 @@ public class PageLinkCollector
 
     public Uri CollectionUri { get; set; }
 
-    public async Task<IEnumerable<Uri>> Extract()
+    public async Task<IEnumerable<Uri>> Collect()
     {
-        var regexBase = GetRegexBaseAddress();
         var regexForFullUris = new Regex(
-            $@"(?:(?:https?|http?):\/\/|www\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])");
+            @"((http?:\/\/|https?:\/\/)(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s""]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s""']{2,}|(http?:\/\/|https?:\/\/)(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s""]{2,}|www\.[a-zA-Z0-9]+\.[^\s""']{2,})");
         var regexForPartialUris = new Regex(@$"(?<=href={"\""}|url{"\""}:{"\""})\/[-a-zA-Z0-9()@:%_\+.~#\/=;]+");
         var uris = new List<Uri>();
 
         using HttpResponseMessage response = await _httpClient.GetAsync(CollectionUri);
         using HttpContent content = response.Content;
-        using Stream stream = await content.ReadAsStreamAsync();
-        using StreamReader streamReader = new(stream);
         string result = await content.ReadAsStringAsync();
 
         var fullUriMatches = regexForFullUris.Matches(result);
@@ -64,19 +61,6 @@ public class PageLinkCollector
         }
 
         return hostUris;
-    }
-
-    private string GetRegexBaseAddress()
-    {
-        var regexBase = BaseUri.AbsoluteUri.ToString();
-        regexBase = regexBase.Replace("https://", "");
-        regexBase = regexBase.Replace("http://", "");
-        regexBase = regexBase.Replace("www.", "");
-        regexBase = regexBase.Replace(@"\", @"\\");
-        regexBase = regexBase.Replace(@"/", "\\/");
-        regexBase = regexBase.Replace(@".", "\\.");
-
-        return regexBase;
     }
 
     private bool TryGetUriFromFullUriMatch(string value, [MaybeNullWhen(false)] out Uri uri)

@@ -77,7 +77,7 @@ public class Crawler
         try
         {
             var pageLinkExtractor = new PageLinkCollector(_httpClient, StartingUri, uri, _loggerFactory.CreateLogger<PageLinkCollector>());
-            var results = await pageLinkExtractor.Extract();
+            var results = await pageLinkExtractor.Collect();
             _linkQueue.Enqueue(results);
         }
         catch
