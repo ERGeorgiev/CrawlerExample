@@ -42,6 +42,7 @@ public class Crawler
     public async Task Run()
     {
         RobotsConfig = await _pageRobotsReader.Get();
+        _linkQueue.Configure(RobotsConfig);
 
         _linkQueue.Enqueue(new Uri[] { StartingUri });
 

@@ -27,6 +27,18 @@ internal class Program
             Task.Delay(1000).Wait();
         }
 
+        if (crawlerTask.IsFaulted)
+        {
+            if (crawlerTask.Exception != null)
+            {
+                throw crawlerTask.Exception;
+            }
+            else
+            {
+                throw new Exception("Unknown error.");
+            }
+        }
+
         Console.WriteLine();
         Console.WriteLine("{0} unique uris found:", crawler.Count);
         foreach (var uri in crawler.Results.OrderBy(r => r.AbsoluteUri))
