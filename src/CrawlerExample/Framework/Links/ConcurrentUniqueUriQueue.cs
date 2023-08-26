@@ -33,7 +33,10 @@ public class ConcurrentUniqueUriQueue : IUriQueue
                 uriIsIgnored = _ignoredBaseUris.Any(ignored => uri.AbsolutePath.StartsWith(ignored.AbsolutePath, StringComparison.OrdinalIgnoreCase));
                 if (uriIsIgnored) continue;
 
-                if (_uniqueUris.Add(uri)) _uris.Enqueue(uri);
+                if (_uniqueUris.Add(uri) && UriPointsToFile(uri) == false)
+                {
+                    _uris.Enqueue(uri);
+                }
             }
         }
     }
@@ -44,5 +47,10 @@ public class ConcurrentUniqueUriQueue : IUriQueue
         {
             return _uris.TryDequeue(out result);
         }
+    }
+
+    private static bool UriPointsToFile(Uri uri)
+    {
+        return uri.Segments.Last().Contains('.', StringComparison.OrdinalIgnoreCase);
     }
 }

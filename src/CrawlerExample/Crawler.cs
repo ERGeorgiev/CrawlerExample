@@ -2,6 +2,7 @@
 using CrawlerExample.Framework.Links;
 using CrawlerExample.Framework.Page;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 namespace CrawlerExample;
 
@@ -12,18 +13,21 @@ public class Crawler
     private readonly int _delayWaitForQueueItemsMs = 100;
     private readonly ConcurrentUniqueUriQueue _linkQueue = new();
     private readonly PageRobotsReader _pageRobotsReader;
+    private readonly HttpClient _httpClient;
     private readonly ILoggerFactory _loggerFactory;
 
-    private RobotsFileConfiguration _robotsConfig;
+    private RobotsFileConfiguration _robotsConfig = new();
     private DateTime _lastCrawl = DateTime.MinValue;
 
     public Crawler(CrawlerConfiguration configuration, Uri startingLink, ILoggerFactory loggerFactory)
     {
-        _semaphoreSlimMaxCount = configuration.ThreadsMax;
-        _semaphore = new(_semaphoreSlimMaxCount, _semaphoreSlimMaxCount);
-        _pageRobotsReader = new PageRobotsReader(startingLink);
         _loggerFactory = loggerFactory;
         StartingUri = startingLink;
+
+        _httpClient = new HttpClient();
+        _semaphoreSlimMaxCount = configuration.ThreadsMax;
+        _semaphore = new(_semaphoreSlimMaxCount, _semaphoreSlimMaxCount);
+        _pageRobotsReader = new PageRobotsReader(_httpClient, startingLink);
     }
 
     public IEnumerable<Uri> Results => _linkQueue.GetUniqueEnqueued();
@@ -68,7 +72,7 @@ public class Crawler
     {
         try
         {
-            var pageLinkExtractor = new PageLinkCollector(StartingUri, uri, _loggerFactory.CreateLogger<PageLinkCollector>());
+            var pageLinkExtractor = new PageLinkCollector(_httpClient, StartingUri, uri, _loggerFactory.CreateLogger<PageLinkCollector>());
             var results = await pageLinkExtractor.Extract();
             _linkQueue.Enqueue(results);
         }

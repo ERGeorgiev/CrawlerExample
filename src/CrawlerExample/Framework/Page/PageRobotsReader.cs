@@ -7,8 +7,11 @@ public class PageRobotsReader
     private const string _robotsAddress = "robots.txt";
     private const string _targetSectionTitle = "User-agent: *";
 
-    public PageRobotsReader(Uri uri)
+    private readonly HttpClient _httpClient;
+
+    public PageRobotsReader(HttpClient httpClient, Uri uri)
     {
+        _httpClient = httpClient;
         Uri = new Uri(uri, _robotsAddress);
     }
 
@@ -18,8 +21,7 @@ public class PageRobotsReader
     {
         var config = new RobotsFileConfiguration();
 
-        using HttpClient client = new();
-        using HttpResponseMessage response = await client.GetAsync(Uri);
+        using HttpResponseMessage response = await _httpClient.GetAsync(Uri);
         using HttpContent content = response.Content;
         using Stream stream = await content.ReadAsStreamAsync();
         using StreamReader streamReader = new(stream);
@@ -40,8 +42,6 @@ public class PageRobotsReader
                 }
             }
         }
-
-        string result = await content.ReadAsStringAsync();
 
         return config;
     }
