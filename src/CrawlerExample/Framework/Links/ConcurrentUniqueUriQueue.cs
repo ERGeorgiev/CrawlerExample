@@ -34,7 +34,7 @@ public class ConcurrentUniqueUriQueue : IUriQueue
                 if (uriIsIgnored) continue;
 
                 var absoluteUri = uri.AbsoluteUri.TrimEnd('\\').TrimEnd('/');
-                if (_uniqueUris.Add(uri.AbsoluteUri) && UriPointsToFile(uri) == false)
+                if (_uniqueUris.Add(uri.AbsoluteUri) && UriPointsToVisualFile(uri) == false)
                 {
                     _uris.Enqueue(uri);
                 }
@@ -50,9 +50,9 @@ public class ConcurrentUniqueUriQueue : IUriQueue
         }
     }
 
-    private static bool UriPointsToFile(Uri uri)
+    private static bool UriPointsToVisualFile(Uri uri)
     {
-        var fileEndings = new string[] { ".jpg", ".png", ".svg" };
+        var fileEndings = new string[] { ".jpg", ".png", ".svg", ".pdf", ".mp3", ".mp4", ".m4a" };
         foreach (var ending in fileEndings)
         {
             if (uri.Segments.Last().EndsWith(ending, StringComparison.OrdinalIgnoreCase))
