@@ -1,6 +1,6 @@
 namespace CrawlerExample.Test.Unit;
 
-public class UnitTest1
+public class CrawlerTests
 {
     [Fact]
     public void Test1()

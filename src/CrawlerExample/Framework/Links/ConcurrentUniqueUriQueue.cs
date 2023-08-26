@@ -7,16 +7,11 @@ public class ConcurrentUniqueUriQueue
 {
     private readonly object _urisLock = new();
     private readonly Queue<Uri> _uris = new();
-    private readonly HashSet<string> _uniqueUris = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _historicalUris = new(StringComparer.OrdinalIgnoreCase);
 
     private List<Uri> _ignoredBaseUris = new();
 
-    public int TotalUniqueEnqueued => _uniqueUris.Count;
-    // Enqueue, check if count is increased.
-    // Enqueue, ensure count is not increased if duplicate.
-    // Enqueue, check if TotalUniqueEnqueued is increased
-    // Enqueue, check if TotalUniqueEnqueued is not increased on duplicate
-    // Add ignored base uris, Enqueue and ensure it is ignored
+    public int HistoricalCount => _historicalUris.Count;
 
     public int Count => _uris.Count;
 
@@ -28,11 +23,11 @@ public class ConcurrentUniqueUriQueue
         }
     }
 
-    public IEnumerable<Uri> GetUniqueEnqueued()
+    public IEnumerable<Uri> GetHistoricalEnqueued()
     {
         lock (_urisLock)
         {
-            return _uniqueUris.Select(u => new Uri(u)).ToArray();
+            return _historicalUris.Select(u => new Uri(u)).ToArray();
         }
     }
 
@@ -50,7 +45,7 @@ public class ConcurrentUniqueUriQueue
                 }
 
                 var absoluteUri = uri.AbsoluteUri.TrimEnd('\\').TrimEnd('/');
-                if (_uniqueUris.Add(uri.AbsoluteUri) && UriPointsToVisualFile(uri) == false)
+                if (_historicalUris.Add(uri.AbsoluteUri) && UriPointsToMediaFile(uri) == false)
                 {
                     _uris.Enqueue(uri);
                 }
@@ -66,7 +61,7 @@ public class ConcurrentUniqueUriQueue
         }
     }
 
-    private static bool UriPointsToVisualFile(Uri uri)
+    private static bool UriPointsToMediaFile(Uri uri)
     {
         var fileEndings = new string[] { ".jpg", ".png", ".svg", ".pdf", ".mp3", ".mp4", ".m4a" };
         foreach (var ending in fileEndings)

@@ -31,9 +31,9 @@ public class Crawler
         _logger = _loggerFactory.CreateLogger<Crawler>();
     }
 
-    public IEnumerable<Uri> Results => _linkQueue.GetUniqueEnqueued();
+    public IEnumerable<Uri> Results => _linkQueue.GetHistoricalEnqueued();
 
-    public int Count => _linkQueue.TotalUniqueEnqueued;
+    public int Count => _linkQueue.HistoricalCount;
 
     public Uri StartingUri { get; }
 
