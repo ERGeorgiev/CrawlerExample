@@ -2,7 +2,7 @@
 
 namespace CrawlerExample.Framework.Links;
 
-public interface ILinkQueue
+public interface IUriQueue
 {
     public void Enqueue(IEnumerable<Uri> uris);
 

@@ -1,5 +1,6 @@
 ﻿using CrawlerExample.Configuration;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 namespace CrawlerExample.Demo;
@@ -11,27 +12,37 @@ internal class Program
         Console.WriteLine("CrawlerExample Demo v{0}", Assembly.GetExecutingAssembly().GetName().Version!.ToString());
         Console.WriteLine();
 
-        var startingLink = GetLinkFromArgs(args);
-        Console.WriteLine("Crawl Link: {0}", startingLink);
+        var startingUri = GetLinkFromArgs(args);
+        Console.WriteLine("Crawl Uri: {0}", startingUri);
 
         var config = GetCrawlerExampleConfiguration();
-        var crawler = new Crawler(config, startingLink);
+        var crawler = new Crawler(config, startingUri, GetLoggerFactory());
 
         Console.WriteLine("Starting Crawler...");
         var crawlerTask = crawler.Run();
         Console.WriteLine("Crawler Started Successfully");
         while (crawlerTask.Status == TaskStatus.Running || crawlerTask.Status == TaskStatus.WaitingForActivation)
         {
-            Console.WriteLine("Number of links found: {0}", crawler.Count);
+            Console.WriteLine("Number of uris found: {0}", crawler.Count);
             Task.Delay(1000).Wait();
         }
 
         Console.WriteLine();
-        Console.WriteLine("{0} links found:", crawler.Count);
+        Console.WriteLine("{0} uri found:", crawler.Count);
         foreach (var uri in crawler.Results.OrderBy(r => r.AbsoluteUri))
         {
             Console.WriteLine(uri.AbsoluteUri);
         }
+    }
+
+    private static ILoggerFactory GetLoggerFactory()
+    {
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+        });
+
+        return loggerFactory;
     }
 
     private static Uri GetLinkFromArgs(string[] args)

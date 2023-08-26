@@ -2,5 +2,7 @@
 
 public class RobotsFileConfiguration
 {
-    public int CrawlDelayMs { get; set; } = 10;
+    public int CrawlDelay { get; set; } = 0;
+
+    public List<Uri> Disallow = new();
 }
