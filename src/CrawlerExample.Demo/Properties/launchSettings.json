@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CrawlerExample.Demo": {
+      "commandName": "Project",
+      "commandLineArgs": "https://www.youtube.com/"
+    }
+  }
+}

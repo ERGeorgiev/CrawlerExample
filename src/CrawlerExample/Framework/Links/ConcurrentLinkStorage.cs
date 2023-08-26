@@ -5,6 +5,8 @@ public class ConcurrentLinkStorage
     private readonly object _linksLock = new();
     private readonly HashSet<Uri> _links = new();
 
+    public int Count => _links.Count;
+
     public void Add(IEnumerable<Uri> uris)
     {
         lock (_linksLock)
