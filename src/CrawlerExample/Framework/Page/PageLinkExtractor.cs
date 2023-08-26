@@ -11,7 +11,8 @@ public class PageLinkExtractor
 
     public async Task<IEnumerable<Uri>> Extract()
     {
+        var rnd = new Random();
         await Task.Delay(1000);
-        return new List<Uri>() { new Uri("https://www.youtube.com/1"), new Uri("https://www.youtube.com/2") };
+        return new List<Uri>() { new Uri($"https://www.youtube.com/{Random.Shared.Next(0, 100)}"), new Uri($"https://www.youtube.com/{Random.Shared.Next(0, 100)}") };
     }
 }

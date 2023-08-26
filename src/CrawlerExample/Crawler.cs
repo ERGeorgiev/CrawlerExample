@@ -6,51 +6,52 @@ namespace CrawlerExample;
 
 public class Crawler
 {
-    private readonly object _runLock = new();
     private readonly int _msDelayWaitForQueueItems = 100;
     private readonly ConcurrentUniqueLinkQueue _linkQueue = new();
-    private readonly ExtractAndQueueService _pageLinkExtractorService;
-    private readonly Task? _extractorDoneNotificationTask;
+    private readonly SemaphoreSlim _semaphore;
+    private readonly int _semaphoreSlimMaxCount;
 
-    public Crawler(CrawlerConfiguration configuration)
+    public Crawler(CrawlerConfiguration configuration, Uri startingLink)
     {
-        _pageLinkExtractorService = new ExtractAndQueueService(_linkQueue, configuration.ThreadsMax);
+        _semaphoreSlimMaxCount = configuration.ThreadsMax;
+        _semaphore = new(_semaphoreSlimMaxCount, _semaphoreSlimMaxCount);
+        StartingLink = startingLink;
     }
 
     public IEnumerable<Uri> Results => _linkQueue.GetUniqueEnqueued();
 
     public int Count => _linkQueue.TotalUniqueEnqueued;
 
-    public async Task Run(Uri startingLink)
+    public Uri StartingLink { get; }
+
+    public async Task Run()
     {
-        bool lockTaken = false;
-        try
+        _linkQueue.Enqueue(new Uri[] { StartingLink });
+        while (_linkQueue.Count > 0 || _semaphore.CurrentCount < _semaphoreSlimMaxCount)
         {
-            Monitor.TryEnter(_runLock, 0, ref lockTaken);
-            if (lockTaken)
+            if (_linkQueue.TryDequeue(out Uri? uri))
             {
-                _linkQueue.Enqueue(new Uri[] { startingLink });
-                while (_linkQueue.Count > 0 || _pageLinkExtractorService.Running)
-                {
-                    if (_linkQueue.Count > 0)
-                    {
-                        _pageLinkExtractorService.BeginExtraction();
-                    }
-                    else
-                    {
-                        await Task.Delay(_msDelayWaitForQueueItems);
-                    }
-                }
+                await _semaphore.WaitAsync();
+                ExtractEnqueueAndRelease(uri);
             }
             else
             {
-
+                await Task.Delay(_msDelayWaitForQueueItems);
             }
-            Console.WriteLine("Completed");
+        }
+    }
+
+    private async void ExtractEnqueueAndRelease(Uri uri)
+    {
+        try
+        {
+            var pageLinkExtractor = new PageLinkExtractor(uri);
+            var results = await pageLinkExtractor.Extract();
+            _linkQueue.Enqueue(results);
         }
         finally
         {
-            if (lockTaken) Monitor.Exit(_runLock);
+            _semaphore.Release();
         }
     }
 }

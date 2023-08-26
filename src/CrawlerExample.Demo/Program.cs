@@ -15,24 +15,20 @@ internal class Program
         Console.WriteLine("Crawl Link: {0}", startingLink);
 
         var config = GetCrawlerExampleConfiguration();
-        var crawler = new Crawler(config);
+        var crawler = new Crawler(config, startingLink);
 
         Console.WriteLine("Starting Crawler...", startingLink);
-        var crawlerTask = crawler.Run(startingLink);
-        while (crawlerTask.Status == TaskStatus.WaitingForActivation)
-        {
-            Task.Delay(10).Wait();
-        }
+        var crawlerTask = crawler.Run();
         Console.WriteLine("Crawler Started Successfully", startingLink);
-        while (crawlerTask.Status == TaskStatus.Running)
+        while (crawlerTask.Status == TaskStatus.Running || crawlerTask.Status == TaskStatus.WaitingForActivation)
         {
             Console.WriteLine("Number of links found: {0}", crawler.Count);
-            Task.Delay(1000).Wait();
+            Task.Delay(500).Wait();
         }
 
         Console.WriteLine();
         Console.WriteLine("All links found:", crawler.Count);
-        foreach (var uri in crawler.Results)
+        foreach (var uri in crawler.Results.OrderBy(r => r.AbsoluteUri))
         {
             Console.WriteLine(uri.AbsoluteUri);
         }
