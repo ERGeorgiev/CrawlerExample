@@ -6,7 +6,7 @@ public class ConcurrentUniqueUriQueue : IUriQueue
 {
     private readonly object _urisLock = new();
     private readonly Queue<Uri> _uris = new();
-    private readonly HashSet<Uri> _uniqueUris = new();
+    private readonly HashSet<string> _uniqueUris = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<Uri> _ignoredBaseUris = new();
 
     public int TotalUniqueEnqueued => _uniqueUris.Count;
@@ -19,7 +19,7 @@ public class ConcurrentUniqueUriQueue : IUriQueue
     {
         lock (_urisLock)
         {
-            return _uniqueUris.ToArray();
+            return _uniqueUris.Select(u => new Uri(u)).ToArray();
         }
     }
 
@@ -33,7 +33,8 @@ public class ConcurrentUniqueUriQueue : IUriQueue
                 uriIsIgnored = _ignoredBaseUris.Any(ignored => uri.AbsolutePath.StartsWith(ignored.AbsolutePath, StringComparison.OrdinalIgnoreCase));
                 if (uriIsIgnored) continue;
 
-                if (_uniqueUris.Add(uri) && UriPointsToFile(uri) == false)
+                var absoluteUri = uri.AbsoluteUri.TrimEnd('\\').TrimEnd('/');
+                if (_uniqueUris.Add(uri.AbsoluteUri) && UriPointsToFile(uri) == false)
                 {
                     _uris.Enqueue(uri);
                 }
@@ -51,6 +52,15 @@ public class ConcurrentUniqueUriQueue : IUriQueue
 
     private static bool UriPointsToFile(Uri uri)
     {
-        return uri.Segments.Last().Contains('.', StringComparison.OrdinalIgnoreCase);
+        var fileEndings = new string[] { ".jpg", ".png", ".svg" };
+        foreach (var ending in fileEndings)
+        {
+            if (uri.Segments.Last().EndsWith(ending, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

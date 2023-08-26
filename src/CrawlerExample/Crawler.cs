@@ -2,7 +2,6 @@
 using CrawlerExample.Framework.Links;
 using CrawlerExample.Framework.Page;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
 
 namespace CrawlerExample;
 
@@ -15,8 +14,8 @@ public class Crawler
     private readonly PageRobotsReader _pageRobotsReader;
     private readonly HttpClient _httpClient;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly ILogger<Crawler> _logger;
 
-    private RobotsFileConfiguration _robotsConfig = new();
     private DateTime _lastCrawl = DateTime.MinValue;
 
     public Crawler(CrawlerConfiguration configuration, Uri startingLink, ILoggerFactory loggerFactory)
@@ -25,9 +24,11 @@ public class Crawler
         StartingUri = startingLink;
 
         _httpClient = new HttpClient();
+        _httpClient.AddUserAgent();
         _semaphoreSlimMaxCount = configuration.ThreadsMax;
         _semaphore = new(_semaphoreSlimMaxCount, _semaphoreSlimMaxCount);
-        _pageRobotsReader = new PageRobotsReader(_httpClient, startingLink);
+        _pageRobotsReader = new PageRobotsReader(_httpClient, startingLink, _loggerFactory.CreateLogger<PageLinkCollector>());
+        _logger = _loggerFactory.CreateLogger<Crawler>();
     }
 
     public IEnumerable<Uri> Results => _linkQueue.GetUniqueEnqueued();
@@ -36,9 +37,11 @@ public class Crawler
 
     public Uri StartingUri { get; }
 
+    public RobotsFileConfiguration RobotsConfig { get; private set; } = new();
+
     public async Task Run()
     {
-        _robotsConfig = await _pageRobotsReader.Get();
+        RobotsConfig = await _pageRobotsReader.Get();
 
         _linkQueue.Enqueue(new Uri[] { StartingUri });
 
@@ -49,7 +52,7 @@ public class Crawler
             {
                 await _semaphore.WaitAsync();
                 _lastCrawl = DateTime.Now;
-                ExtractEnqueueAndRelease(uri);
+                CollectEnqueueAndRelease(uri);
             }
             else
             {
@@ -60,7 +63,7 @@ public class Crawler
 
     private async Task EnsureCrawlDelay()
     {
-        var nextCall = _lastCrawl + TimeSpan.FromMilliseconds(_robotsConfig.CrawlDelay);
+        var nextCall = _lastCrawl + TimeSpan.FromMilliseconds(RobotsConfig.CrawlDelay);
         var timeToWait = nextCall - DateTime.Now;
         if (timeToWait.TotalMilliseconds > 0)
         {
@@ -68,13 +71,17 @@ public class Crawler
         }
     }
 
-    private async void ExtractEnqueueAndRelease(Uri uri)
+    private async void CollectEnqueueAndRelease(Uri uri)
     {
         try
         {
             var pageLinkExtractor = new PageLinkCollector(_httpClient, StartingUri, uri, _loggerFactory.CreateLogger<PageLinkCollector>());
             var results = await pageLinkExtractor.Extract();
             _linkQueue.Enqueue(results);
+        }
+        catch
+        {
+            _logger.LogError("Failed to collect from uri '{uri}'", uri.AbsoluteUri);
         }
         finally
         {

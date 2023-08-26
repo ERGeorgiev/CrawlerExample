@@ -1,4 +1,6 @@
 ﻿using CrawlerExample.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CrawlerExample.Framework.Page;
 
@@ -8,18 +10,20 @@ public class PageRobotsReader
     private const string _targetSectionTitle = "User-agent: *";
 
     private readonly HttpClient _httpClient;
+    private readonly ILogger<PageLinkCollector> _logger;
 
-    public PageRobotsReader(HttpClient httpClient, Uri uri)
+    public PageRobotsReader(HttpClient httpClient, Uri uri, ILogger<PageLinkCollector> logger)
     {
         _httpClient = httpClient;
         Uri = new Uri(uri, _robotsAddress);
+        _logger = logger;
     }
 
     public Uri Uri { get; set; }
 
     public async Task<RobotsFileConfiguration> Get()
     {
-        var config = new RobotsFileConfiguration();
+        RobotsFileConfiguration config = new();
 
         using HttpResponseMessage response = await _httpClient.GetAsync(Uri);
         using HttpContent content = response.Content;
@@ -42,6 +46,8 @@ public class PageRobotsReader
                 }
             }
         }
+
+        _logger.LogInformation("Robots Config: {config}", JsonConvert.SerializeObject(config, Formatting.Indented));
 
         return config;
     }

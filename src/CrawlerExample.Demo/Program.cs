@@ -28,7 +28,7 @@ internal class Program
         }
 
         Console.WriteLine();
-        Console.WriteLine("{0} uri found:", crawler.Count);
+        Console.WriteLine("{0} unique uris found:", crawler.Count);
         foreach (var uri in crawler.Results.OrderBy(r => r.AbsoluteUri))
         {
             Console.WriteLine(uri.AbsoluteUri);

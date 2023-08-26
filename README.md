@@ -7,3 +7,7 @@ As such, I have decided to avoid using DI for this project.
 
 ## Why use a single HttpClient?
 More info: https://www.aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
+
+## Not Supported
+- Uris with Parameters
+- File-type Uris
