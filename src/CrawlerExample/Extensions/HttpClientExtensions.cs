@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CrawlerExample.Framework.Links;
+namespace CrawlerExample.Extensions;
 
 public static class HttpClientExtensions
 {

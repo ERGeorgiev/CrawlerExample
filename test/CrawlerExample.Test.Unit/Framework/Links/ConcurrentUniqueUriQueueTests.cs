@@ -1,7 +1,7 @@
 using CrawlerExample.Configuration;
 using CrawlerExample.Framework.Links;
 
-namespace CrawlerExample.Test.Unit;
+namespace CrawlerExample.Test.Unit.Framework.Links;
 
 public class ConcurrentUniqueUriQueueTests
 {

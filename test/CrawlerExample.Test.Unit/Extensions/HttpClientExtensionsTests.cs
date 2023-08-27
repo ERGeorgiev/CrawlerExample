@@ -1,7 +1,6 @@
-using CrawlerExample.Framework.Links;
-using System.Net.Http.Headers;
+using CrawlerExample.Extensions;
 
-namespace CrawlerExample.Test.Unit;
+namespace CrawlerExample.Test.Unit.Extensions;
 
 public class HttpClientExtensionsTests
 {

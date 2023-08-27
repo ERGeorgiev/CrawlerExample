@@ -1,4 +1,5 @@
 ﻿using CrawlerExample.Configuration;
+using CrawlerExample.Extensions;
 using CrawlerExample.Framework.Links;
 using CrawlerExample.Framework.Page;
 using Microsoft.Extensions.Logging;

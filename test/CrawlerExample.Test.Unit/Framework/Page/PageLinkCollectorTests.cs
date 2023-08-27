@@ -1,7 +1,7 @@
 using CrawlerExample.Framework.Page;
 using Microsoft.Extensions.Logging;
 
-namespace CrawlerExample.Test.Unit;
+namespace CrawlerExample.Test.Unit.Framework.Page;
 
 public class PageLinkCollectorTests
 {
