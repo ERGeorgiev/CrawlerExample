@@ -49,7 +49,7 @@ public class PageLinkCollector : IPageLinkCollector
             }
         }
         uris = uris.DistinctBy(u => u.AbsoluteUri).ToList();
-        var hostUris = uris.Where(u => u.AbsoluteUri.Contains(BaseUri.Host, StringComparison.OrdinalIgnoreCase));
+        var hostUris = uris.Where(u => u.Host.Equals(BaseUri.Host, StringComparison.OrdinalIgnoreCase));
 
         if (uris.Any())
         {
