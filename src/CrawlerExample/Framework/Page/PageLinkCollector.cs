@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace CrawlerExample.Framework.Page;
 
-public class PageLinkCollector
+public class PageLinkCollector : IPageLinkCollector
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<PageLinkCollector> _logger;

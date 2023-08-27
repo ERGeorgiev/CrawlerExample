@@ -20,15 +20,16 @@ internal class Program
         var config = GetCrawlerExampleConfiguration();
         var robotsConfig = new PageRobotsReader(httpClient, startingUri, loggerFactory.CreateLogger<PageRobotsReader>()).Get().Result;
         var queue = new ConcurrentUniqueUriQueue(robotsConfig);
+        var collectorFactory = new PageLinkCollectorFactory(httpClient, loggerFactory);
         Console.WriteLine("Crawl Uri: {0}", startingUri);
 
-        var crawler = new Crawler(config, httpClient, queue, startingUri, loggerFactory);
+        var crawler = new Crawler(config, httpClient, queue, collectorFactory, startingUri, loggerFactory);
         Console.WriteLine("Starting Crawler...");
         var crawlerTask = crawler.Run();
         Console.WriteLine("Crawler Started Successfully");
         while (crawlerTask.Status == TaskStatus.Running || crawlerTask.Status == TaskStatus.WaitingForActivation)
         {
-            Console.WriteLine("Number of uris found: {0}", crawler.Count);
+            Console.WriteLine("Number of uris found: {0}", queue.HistoricalCount);
             Task.Delay(1000).Wait();
         }
 
@@ -45,8 +46,8 @@ internal class Program
         }
 
         Console.WriteLine();
-        Console.WriteLine("{0} unique uris found:", crawler.Count);
-        foreach (var uri in crawler.Results.OrderBy(r => r.AbsoluteUri))
+        Console.WriteLine("{0} unique uris found:", queue.HistoricalCount);
+        foreach (var uri in queue.GetHistoricalEnqueued().OrderBy(r => r.AbsoluteUri))
         {
             Console.WriteLine(uri.AbsoluteUri);
         }
