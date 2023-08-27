@@ -10,9 +10,9 @@ public class PageRobotsReader
     private const string _targetSectionTitle = "User-agent: *";
 
     private readonly HttpClient _httpClient;
-    private readonly ILogger<PageLinkCollector> _logger;
+    private readonly ILogger<PageRobotsReader> _logger;
 
-    public PageRobotsReader(HttpClient httpClient, Uri uri, ILogger<PageLinkCollector> logger)
+    public PageRobotsReader(HttpClient httpClient, Uri uri, ILogger<PageRobotsReader> logger)
     {
         _httpClient = httpClient;
         Uri = new Uri(uri, _robotsAddress);
@@ -60,6 +60,14 @@ public class PageRobotsReader
             var disallowedRelativeUriString = line.Substring(disallowField.Length);
             var disallowedRelativeUri = new Uri(disallowedRelativeUriString, UriKind.Relative);
             config.Disallow.Add(disallowedRelativeUri);
+        }
+
+        var crawlDelayField = "Crawl-delay: ";
+        if (line.StartsWith(crawlDelayField, StringComparison.OrdinalIgnoreCase))
+        {
+            var crawlDelayString = line.Substring(crawlDelayField.Length);
+            var crawlDelayInt = int.Parse(crawlDelayString);
+            config.CrawlDelay = crawlDelayInt;
         }
     }
 }

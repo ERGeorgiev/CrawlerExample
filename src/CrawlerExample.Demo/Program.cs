@@ -1,4 +1,6 @@
 ﻿using CrawlerExample.Configuration;
+using CrawlerExample.Framework.Links;
+using CrawlerExample.Framework.Page;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -13,11 +15,14 @@ internal class Program
         Console.WriteLine();
 
         var startingUri = GetLinkFromArgs(args);
+        var httpClient = new HttpClient();
+        var loggerFactory = GetLoggerFactory();
+        var config = GetCrawlerExampleConfiguration();
+        var robotsConfig = new PageRobotsReader(httpClient, startingUri, loggerFactory.CreateLogger<PageRobotsReader>()).Get().Result;
+        var queue = new ConcurrentUniqueUriQueue(robotsConfig);
         Console.WriteLine("Crawl Uri: {0}", startingUri);
 
-        var config = GetCrawlerExampleConfiguration();
-        var crawler = new Crawler(config, startingUri, GetLoggerFactory());
-
+        var crawler = new Crawler(config, httpClient, queue, startingUri, loggerFactory);
         Console.WriteLine("Starting Crawler...");
         var crawlerTask = crawler.Run();
         Console.WriteLine("Crawler Started Successfully");

@@ -1,17 +1,16 @@
 using CrawlerExample.Configuration;
 using CrawlerExample.Framework.Links;
-using System.Net.Http.Headers;
 
 namespace CrawlerExample.Test.Unit;
 
 public class ConcurrentUniqueUriQueueTests
 {
-    private readonly ConcurrentUniqueUriQueue _sut = new();
+    private ConcurrentUniqueUriQueue _sut = new(new RobotsFileConfiguration());
 
     [Fact]
     public void Enqueue_CountIncreased()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         var expectedCount = _sut.Count + 1;
 
         _sut.Enqueue(new Uri[] { exampleUriA });
@@ -22,7 +21,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Enqueue_Duplicate_CountNotIncreased()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         var exampleUriB = new Uri(exampleUriA.OriginalString);
         var expectedCount = _sut.Count + 1;
 
@@ -34,7 +33,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Enqueue_MediaUri_OnlyHistoricalCountIncreased()
     {
-        var exampleUriA = GetRandomMediaUri();
+        var exampleUriA = UriHelper.GetRandomMediaUri();
         var expectedCount = _sut.Count;
         var expectedHistoricalCount = _sut.HistoricalCount + 1;
 
@@ -47,7 +46,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Enqueue_HistoricalCountIncreased()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         var expectedCount = _sut.HistoricalCount + 1;
 
         _sut.Enqueue(new Uri[] { exampleUriA });
@@ -58,7 +57,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Enqueue_Duplicate_HistoricalCountNotIncreased()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         var exampleUriB = new Uri(exampleUriA.OriginalString);
         var expectedCount = _sut.HistoricalCount + 1;
 
@@ -70,7 +69,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Enqueue_Duplicate_GetEnqueuedMatchesUniqueInput()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         var exampleUriB = new Uri(exampleUriA.OriginalString);
 
         _sut.Enqueue(new Uri[] { exampleUriA, exampleUriB });
@@ -82,7 +81,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Enqueue_ConfiguredToIgnore_NotEnqueued()
     {
-        var exampleUriA = new Uri(GetRandomUri().AbsoluteUri + "ignored/", UriKind.Absolute);
+        var exampleUriA = new Uri(UriHelper.GetRandomUri().AbsoluteUri + "ignored/", UriKind.Absolute);
         var config = new RobotsFileConfiguration()
         {
             Disallow = new List<Uri>()
@@ -91,7 +90,7 @@ public class ConcurrentUniqueUriQueueTests
             }
         };
 
-        _sut.Configure(config);
+        _sut = new ConcurrentUniqueUriQueue(config);
         _sut.Enqueue(new Uri[] { exampleUriA });
 
         Assert.Empty(_sut.GetHistoricalEnqueued());
@@ -100,7 +99,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Dequeue_TrueAndSameAsEnqueued()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         _sut.Enqueue(new Uri[] { exampleUriA });
 
         var result = _sut.TryDequeue(out var uriResult);
@@ -112,7 +111,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Dequeue_CountIsLess()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         _sut.Enqueue(new Uri[] { exampleUriA });
         var expectedCount = _sut.Count - 1;
 
@@ -124,7 +123,7 @@ public class ConcurrentUniqueUriQueueTests
     [Fact]
     public void Dequeue_HistoricalCountIsMore()
     {
-        var exampleUriA = GetRandomUri();
+        var exampleUriA = UriHelper.GetRandomUri();
         var expectedHistoricalCount = _sut.Count + 1;
         _sut.Enqueue(new Uri[] { exampleUriA });
 
@@ -140,8 +139,4 @@ public class ConcurrentUniqueUriQueueTests
 
         Assert.False(result);
     }
-
-    private static Uri GetRandomUri() => new($"https://www.{Random.Shared.Next()}.com");
-
-    private static Uri GetRandomMediaUri() => new($"https://www.{Random.Shared.Next()}.com/hi.jpg");
 }

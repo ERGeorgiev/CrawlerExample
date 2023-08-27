@@ -10,7 +10,7 @@ public class Crawler
     private readonly SemaphoreSlim _semaphore;
     private readonly int _semaphoreSlimMaxCount;
     private readonly int _delayWaitForQueueItemsMs = 100;
-    private readonly ConcurrentUniqueUriQueue _linkQueue = new();
+    private readonly IConcurrentUniqueUriQueue _linkQueue;
     private readonly PageRobotsReader _pageRobotsReader;
     private readonly HttpClient _httpClient;
     private readonly ILoggerFactory _loggerFactory;
@@ -18,16 +18,22 @@ public class Crawler
 
     private DateTime _lastCrawl = DateTime.MinValue;
 
-    public Crawler(CrawlerConfiguration configuration, Uri startingLink, ILoggerFactory loggerFactory)
+    public Crawler(
+        CrawlerConfiguration configuration,
+        HttpClient httpClient,
+        IConcurrentUniqueUriQueue queue,
+        Uri startingLink,
+        ILoggerFactory loggerFactory)
     {
+        _linkQueue = queue;
         _loggerFactory = loggerFactory;
         StartingUri = startingLink;
 
-        _httpClient = new HttpClient();
+        _httpClient = httpClient;
         _httpClient.AddUserAgent();
         _semaphoreSlimMaxCount = configuration.ThreadsMax;
         _semaphore = new(_semaphoreSlimMaxCount, _semaphoreSlimMaxCount);
-        _pageRobotsReader = new PageRobotsReader(_httpClient, startingLink, _loggerFactory.CreateLogger<PageLinkCollector>());
+        _pageRobotsReader = new PageRobotsReader(_httpClient, startingLink, _loggerFactory.CreateLogger<PageRobotsReader>());
         _logger = _loggerFactory.CreateLogger<Crawler>();
     }
 
@@ -41,9 +47,6 @@ public class Crawler
 
     public async Task Run()
     {
-        RobotsConfig = await _pageRobotsReader.Get();
-        _linkQueue.Configure(RobotsConfig);
-
         _linkQueue.Enqueue(new Uri[] { StartingUri });
 
         while (_linkQueue.Count > 0 || _semaphore.CurrentCount < _semaphoreSlimMaxCount)

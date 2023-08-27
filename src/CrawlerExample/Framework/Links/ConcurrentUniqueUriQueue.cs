@@ -3,25 +3,22 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CrawlerExample.Framework.Links;
 
-public class ConcurrentUniqueUriQueue
+public class ConcurrentUniqueUriQueue : IConcurrentUniqueUriQueue
 {
     private readonly object _urisLock = new();
     private readonly Queue<Uri> _uris = new();
     private readonly HashSet<string> _historicalUris = new(StringComparer.OrdinalIgnoreCase);
 
-    private List<Uri> _ignoredBaseUris = new();
+    private readonly List<Uri> _ignoredBaseUris = new();
+
+    public ConcurrentUniqueUriQueue(RobotsFileConfiguration robotsConfig)
+    {
+        _ignoredBaseUris = robotsConfig.Disallow.Select(d => new Uri(d.OriginalString, UriKind.Relative)).ToList();
+    }
 
     public int HistoricalCount => _historicalUris.Count;
 
     public int Count => _uris.Count;
-
-    public void Configure(RobotsFileConfiguration robotsFileConfiguration)
-    {
-        lock (_urisLock)
-        {
-            _ignoredBaseUris = robotsFileConfiguration.Disallow.Select(d => new Uri(d.OriginalString, UriKind.Relative)).ToList();
-        }
-    }
 
     public IEnumerable<Uri> GetHistoricalEnqueued()
     {
