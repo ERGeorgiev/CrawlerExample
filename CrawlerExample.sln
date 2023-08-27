@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample", "src\Crawl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample.Test.Unit", "test\CrawlerExample.Test.Unit\CrawlerExample.Test.Unit.csproj", "{84513562-304A-4F06-8202-3598E2C3A8AA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample.Test.Integration", "test\CrawlerExample.Test.Integration\CrawlerExample.Test.Integration.csproj", "{40B59009-77F5-45A5-87CF-7B50BFFB349A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{76DC3661-B0D0-4BAC-8CA4-95D14BDBDA64}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -34,10 +32,6 @@ Global
 		{84513562-304A-4F06-8202-3598E2C3A8AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84513562-304A-4F06-8202-3598E2C3A8AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84513562-304A-4F06-8202-3598E2C3A8AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{40B59009-77F5-45A5-87CF-7B50BFFB349A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{40B59009-77F5-45A5-87CF-7B50BFFB349A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{40B59009-77F5-45A5-87CF-7B50BFFB349A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{40B59009-77F5-45A5-87CF-7B50BFFB349A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
