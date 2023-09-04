@@ -63,9 +63,14 @@ public class PageLinkCollector : IPageLinkCollector
         return hostUris;
     }
 
+    /// <summary>
+    /// Handles cases such as "/page1/page2", where the host is implied.
+    /// </summary>
     private bool TryGetUriFromFullUriMatch(string value, [MaybeNullWhen(false)] out Uri uri)
     {
         var formattedUri = value.TrimEnd('\\').TrimEnd('/');
+
+        // Fully qualify protocol where missing
         if (formattedUri.StartsWith(BaseUri.Host, StringComparison.OrdinalIgnoreCase))
         {
             if (BaseUri.AbsoluteUri.ToString().StartsWith("https://"))
@@ -91,6 +96,9 @@ public class PageLinkCollector : IPageLinkCollector
         return true;
     }
 
+    /// <summary>
+    /// Handles cases such as "/page1/page2", where the host is implied.
+    /// </summary>
     private bool TryGetUriFromPartialUriMatch(string value, [MaybeNullWhen(false)] out Uri uri)
     {
         var formattedUri = value.TrimEnd('\\').TrimEnd('/');
