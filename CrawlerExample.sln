@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{16EE36DC-F96B-4054-827A-E672DC232261}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrawlerExample.Test.Integration", "test\CrawlerExample.Test.Integration\CrawlerExample.Test.Integration.csproj", "{8D530FB8-3F9C-43CB-8240-165B9D14A215}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,12 +36,17 @@ Global
 		{84513562-304A-4F06-8202-3598E2C3A8AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84513562-304A-4F06-8202-3598E2C3A8AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84513562-304A-4F06-8202-3598E2C3A8AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D530FB8-3F9C-43CB-8240-165B9D14A215}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D530FB8-3F9C-43CB-8240-165B9D14A215}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D530FB8-3F9C-43CB-8240-165B9D14A215}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D530FB8-3F9C-43CB-8240-165B9D14A215}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{84513562-304A-4F06-8202-3598E2C3A8AA} = {16EE36DC-F96B-4054-827A-E672DC232261}
+		{8D530FB8-3F9C-43CB-8240-165B9D14A215} = {16EE36DC-F96B-4054-827A-E672DC232261}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E9FF9C3E-CE48-4D83-9229-309E017A3CAF}

@@ -30,7 +30,7 @@ public class CrawlerTests
     [Fact]
     public void Run_EnqueuesStartingUri()
     {
-        var result = _sut.Run();
+        var result = _sut.RunAsync();
 
         _queueMock.Verify(q => q.Enqueue(It.Is<IEnumerable<Uri>>(s => s.First().AbsoluteUri == _startingUri.AbsoluteUri)));
         _queueMock.Verify(q => q.Enqueue(It.IsAny<IEnumerable<Uri>>()), Times.Once);
@@ -42,7 +42,7 @@ public class CrawlerTests
         _queueMock.Setup(q => q.Count).Returns(1);
         _queueMock.Setup(q => q.TryDequeue(out _startingUri)).Returns(() => { _queueMock.Setup(q => q.Count).Returns(0); return true; });
 
-        var result = _sut.Run();
+        var result = _sut.RunAsync();
 
         _queueMock.Verify(q => q.TryDequeue(out It.Ref<Uri>.IsAny));
     }
@@ -53,7 +53,7 @@ public class CrawlerTests
         _queueMock.Setup(q => q.Count).Returns(1);
         _queueMock.Setup(q => q.TryDequeue(out _startingUri)).Returns(() => { _queueMock.Setup(q => q.Count).Returns(0); return true; });
 
-        var result = _sut.Run();
+        var result = _sut.RunAsync();
 
         _collector.Verify(c => c.Collect(), Times.Once);
     }
@@ -66,7 +66,7 @@ public class CrawlerTests
         _queueMock.Setup(q => q.TryDequeue(out _startingUri)).Returns(() => { _queueMock.Setup(q => q.Count).Returns(0); return true; });
         _collectorReturnedUris.AddRange(collectedUris);
 
-        var result = _sut.Run();
+        var result = _sut.RunAsync();
 
         _queueMock.Verify(q => q.Enqueue(It.Is<IEnumerable<Uri>>(u => u.First().AbsoluteUri == collectedUris.First().AbsoluteUri)), Times.Once);
         _queueMock.Verify(q => q.Enqueue(It.IsAny<IEnumerable<Uri>>()), Times.Exactly(2));

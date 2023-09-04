@@ -43,18 +43,18 @@ public class Crawler
 
     public RobotsFileConfiguration RobotsConfig { get; private set; } = new();
 
-    public async Task Run()
+    public async Task RunAsync()
     {
         _linkQueue.Enqueue(new Uri[] { StartingUri });
 
         while (_linkQueue.Count > 0 || _semaphore.CurrentCount < _semaphoreSlimMaxCount)
         {
-            await EnsureCrawlDelay();
+            await EnsureCrawlDelayAsync();
             if (_linkQueue.TryDequeue(out Uri? uri))
             {
                 await _semaphore.WaitAsync();
                 _lastCrawl = DateTime.Now;
-                CollectEnqueueAndRelease(uri);
+                CollectEnqueueAndReleaseAsync(uri);
             }
             else
             {
@@ -63,7 +63,7 @@ public class Crawler
         }
     }
 
-    private async Task EnsureCrawlDelay()
+    private async Task EnsureCrawlDelayAsync()
     {
         var nextCall = _lastCrawl + TimeSpan.FromMilliseconds(RobotsConfig.CrawlDelay);
         var timeToWait = nextCall - DateTime.Now;
@@ -73,7 +73,7 @@ public class Crawler
         }
     }
 
-    private async void CollectEnqueueAndRelease(Uri uri)
+    private async void CollectEnqueueAndReleaseAsync(Uri uri)
     {
         try
         {

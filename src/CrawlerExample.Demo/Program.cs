@@ -25,7 +25,7 @@ internal class Program
 
         var crawler = new Crawler(config, httpClient, queue, collectorFactory, startingUri, loggerFactory);
         Console.WriteLine("Starting Crawler...");
-        var crawlerTask = crawler.Run();
+        var crawlerTask = crawler.RunAsync();
         Console.WriteLine("Crawler Started Successfully");
         while (crawlerTask.Status == TaskStatus.Running || crawlerTask.Status == TaskStatus.WaitingForActivation)
         {
